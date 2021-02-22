@@ -1,10 +1,10 @@
 import java.io.*;
 import java.util.HashMap;
 
-public class ParseConfig 
+public class ParseCommonConfig 
 {   
     private HashMap<String, String> config_values = new HashMap<String, String>();
-    ParseConfig()
+    ParseCommonConfig()
     {
         try {
             File config_file =  new File("Common.cfg");
