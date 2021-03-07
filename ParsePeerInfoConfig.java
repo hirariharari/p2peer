@@ -34,33 +34,5 @@ public class ParsePeerInfoConfig
     {
         return Arrays.toString(config_values.get(Integer.toString(host_id)));
     }
-    // public int get_host_id()
-    // {
-    //     return Integer.parseInt(config_values.get("NumberOfPreferredNeighbors"));
-    // }
-
-    // public int get_unchoking_interval()
-    // {
-    //     return Integer.parseInt(config_values.get("Unchokinginterval"));
-    // }
-
-    // public int get_optimistic_unchoking_interval()
-    // {
-    //     return Integer.parseInt(config_values.get("OptimisticUnchokingINterval"));
-    // }
-
-    // public String get_file_name()
-    // {
-    //     return config_values.get("FileName");
-    // }
-
-    // public int get_file_size()
-    // {
-    //     return Integer.parseInt(config_values.get("FileSize"));
-    // }
-
-    // public int get_piece_size()
-    // {
-    //     return Integer.parseInt(config_values.get("PieceSize"));
-    // }
+   
 }

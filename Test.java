@@ -14,5 +14,16 @@ public class Test {
             System.out.println(host + " " + psg.get_host_values(Integer.parseInt(host)));
 
         }
+
+        //PeerLog p = new PeerLog("6666");
+        //p.write_close("Hello World peer 6666 calling \n" + "[" + Logging.timestamp() + "]\n");
+        String[] peer_list = {"6000","3000","6666","89786"};
+        Logging log = new Logging();
+        log.tcp_connect_to("1000", "2000");
+        log.tcp_connect_to("1000", "3000");
+        log.tcp_connect_from("1000", "6666");
+        log.preferred_neighbors("1000", peer_list);
+
+
     }
 }
