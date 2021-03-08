@@ -1,5 +1,5 @@
 /**
- * TODO(pkakaraparti/kai.zhang): Implement PeerProcess here.
+ * TODO(cwphang): Implement PeerProcess here.
  * It should be able to:
  * read Common.cfg and set up initial variables
  * start its own listening server
@@ -12,7 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class peerProcess {
+public class PeerProcess {
 
 	Server server; // This peer's server connection
 	ArrayList<PeerConnection> peers; // A list of connected peers.

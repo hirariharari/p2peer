@@ -4,7 +4,7 @@
  */
 package p2peer;
 public class Server {
-
+	Server(String hostname, int port, PeerProcess peerProcess){}
 
 }
 

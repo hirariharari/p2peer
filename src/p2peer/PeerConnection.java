@@ -14,8 +14,8 @@ public class PeerConnection extends Thread{
 	Socket socket; // Should be a unique socket for this connection.
 	FileWrapper filewrapper; // should be a GLOBAL filewrapper for this file.
 	File log;
-	int myPeerID; //the peer ID of THIS peerProcess.
-	int theirPeerID; // The peer ID of the OTHER peerProcess.
+	PeerProcess peer; // this peerProcess.
+	int peerID; // The peer ID of the OTHER peerProcess.
 	
 	public void run() {
 	}

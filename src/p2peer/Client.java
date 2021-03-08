@@ -5,7 +5,7 @@
 package p2peer;
 
 public class Client extends PeerConnection {
-	public Client(int peerID, String hostName, int port, boolean hasFile) {
+	public Client(int peerID, String hostName, int port, boolean hasFile, PeerProcess peerProcess) {
 		//set up connection and peerProcess variables here.
 		
 		this.run();
