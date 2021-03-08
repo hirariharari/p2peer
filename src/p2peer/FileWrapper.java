@@ -1,5 +1,5 @@
 /**
- * TODO(cwphang): Implement a file wrapper that puts the file in memory,
+ * TODO(any): Implement a file wrapper that puts the file in memory,
  * can package segments of a file for sending, and can piece together a complete
  * file from segments received.
  */
