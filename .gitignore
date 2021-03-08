@@ -1,3 +1,8 @@
 *.class
 *.log
 Test.*
+
+/bin/
+*.prefs
+.project
+.classpath
