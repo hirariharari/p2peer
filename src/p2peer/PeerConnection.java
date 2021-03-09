@@ -12,12 +12,13 @@ import java.net.Socket;
 
 public class PeerConnection extends Thread{
 	Socket socket; // Should be a unique socket for this connection.
-	FileWrapper filewrapper; // should be a GLOBAL filewrapper for this file.
-	File log;
-	PeerProcess peer; // this peerProcess.
-	int peerID; // The peer ID of the OTHER peerProcess.
-	
+	int id; // The peer ID of the OTHER peerProcess.
+	PeerConnection(Socket socket, int peerID) {
+		this.socket = socket;
+		this.id = peerID;
+	}
 	public void run() {
+		
 	}
 	public void close() {
 	}

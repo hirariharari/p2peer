@@ -1,5 +1,7 @@
 //The peer Log object to which log messages are written 
 
+package p2peer;
+
 import java.io.File;
 import java.io.FileWriter;
 

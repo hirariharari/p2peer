@@ -14,14 +14,21 @@ import java.util.ArrayList;
 
 public class PeerProcess {
 
-	Server server; // This peer's server connection
-	ArrayList<PeerConnection> peers; // A list of connected peers.
-	int peerID; // This peer's ID.
-	FileWrapper filewrapper; // A FileWrapper object for the file of interest.
-	File log; // A normal file object for this peer's log.
+	static Server server; // This peer's server connection
+	static ArrayList<PeerConnection> peers; // A list of connected peers.
+	static int peerID; // This peer's ID.
+	static FileWrapper filewrapper; // A FileWrapper object for the file of interest.
+	static Logging logging = new Logging();
+	static ParseCommonConfig commonCfg = new ParseCommonConfig();
+	static ParsePeerInfoConfig peerCfg = new ParsePeerInfoConfig();
 	
-	public static void main(String[] args) throws IOException {
-		throw new IOException();
+	public static void main(String[] args) {
+		peerID = Integer.parseInt(args[0]);
+		for (int i = 0; i < peerCfg.get_host_ids().length; i++) {
+			String hostID = peerCfg.get_host_ids()[i];
+			int id = Integer.parseInt(hostID);
+			System.out.println(hostID + " | " + peerCfg.get_host_values(id));
+		}
 	}
 
 }
