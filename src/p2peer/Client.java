@@ -11,7 +11,7 @@ import java.net.UnknownHostException;
 public class Client extends PeerConnection {
 	public Client(int peerID, String host, int port, boolean hasFile) throws UnknownHostException, IOException {
 		//set up connection and peerProcess variables here.
-		super(new Socket(host,port), peerID);
+		super(new Socket(host,port));
 		this.run();
 	}
 }

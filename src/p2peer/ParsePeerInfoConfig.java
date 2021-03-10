@@ -3,11 +3,14 @@ package p2peer;
 import java.io.*;
 import java.sql.Array;
 import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class ParsePeerInfoConfig 
 {   
     private HashMap<String, String[]> config_values = new HashMap<String, String[]>();
+    private ArrayList<String> host_ids = new ArrayList<String>();
+    
     ParsePeerInfoConfig()
     {
         try {
@@ -20,6 +23,7 @@ public class ParsePeerInfoConfig
                 values = str.split(" ", 2);
                 host_values =  values[1].split(" ");
                 config_values.put(values[0], host_values);
+                host_ids.add(values[0]);
             }
         }
         catch (Exception err) 
@@ -30,11 +34,11 @@ public class ParsePeerInfoConfig
     
     public String[] get_host_ids()
     {
-        return config_values.keySet().toArray(String[]::new);
+        // return config_values.keySet().toArray(String[]::new);
+    	return (String[]) host_ids.toArray(new String[host_ids.size()]);
     }
-    public String get_host_values(int host_id)
+    public String[] get_host_values(int host_id)
     {
-        return Arrays.toString(config_values.get(Integer.toString(host_id)));
+        return config_values.get(Integer.toString(host_id));
     }
-   
 }

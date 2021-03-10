@@ -12,10 +12,10 @@ import java.net.Socket;
 
 public class PeerConnection extends Thread{
 	Socket socket; // Should be a unique socket for this connection.
-	int id; // The peer ID of the OTHER peerProcess.
-	PeerConnection(Socket socket, int peerID) {
+	int peerID = -1; // The peer ID of the OTHER peerProcess.
+	PeerConnection(Socket socket) {
 		this.socket = socket;
-		this.id = peerID;
+		this.run();
 	}
 	public void run() {
 		
