@@ -1,5 +1,7 @@
 /**
- * @author cwphang@ufl.edu
+ * @author cwphang
+ * 
+ * A simple container for a message.
  */
 package p2peer;
 

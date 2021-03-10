@@ -1,6 +1,7 @@
 /**
- * TODO(pkakaraparti/kai.zhang): Implement a server process that can accept 
- * incoming requests.
+ * @author cphang
+ * 
+ * A server process that can accept incoming requests.
  */
 package p2peer;
 

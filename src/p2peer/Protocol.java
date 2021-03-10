@@ -1,5 +1,6 @@
 /**
- * @author cwphang@ufl.edu
+ * @author cwphang
+ * 
  * The message protocol used by the project.
  * This will contain the message headers and enums needed for a message
  * as well as the methods for encoding and decoding headers and messages

@@ -1,10 +1,13 @@
 /**
- * TODO(cwphang): Implement PeerProcess here.
- * It should be able to:
- * read Common.cfg and set up initial variables
- * start its own listening server
- *  read PeerInfo.cfg and set up a list of peers to connect to
+ * @author cwphang 
+ * 
+ * PeerProcess implementation.
+ * It is be able to:
+ *   read Common.cfg and PeerInfo.cfg and set up initial variables
+ *   start its own listening server
+ *   read PeerInfo.cfg and set up a list of peers to connect to
  *   connect to peers earlier than itself on the PeerInfo.cfg list
+ *   Log completed handshakes.
  */
 
 package p2peer;

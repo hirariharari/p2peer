@@ -1,6 +1,7 @@
 /**
- * TODO(kai.zhang/kai.zhang): Implement a client process that can connect 
- * to  a server.
+ * @author cwphang
+ * 
+ * The client interface for the project.
  */
 package p2peer;
 

@@ -1,4 +1,8 @@
-//The peer Log object to which log messages are written 
+/**
+ * @author pkakaraparti
+ * 
+ * The peer Log object to which log messages are written 
+ */
 
 package p2peer;
 
