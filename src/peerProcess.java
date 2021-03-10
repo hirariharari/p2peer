@@ -1,7 +1,7 @@
 /**
  * @author cwphang 
  * 
- * PeerProcess implementation.
+ * peerProcess implementation.
  * It is able to:
  *   read Common.cfg and PeerInfo.cfg and set up initial variables
  *   start its own listening server
@@ -10,15 +10,11 @@
  *   Log completed handshakes.
  */
 
-package p2peer;
 import java.io.IOException;
 import java.util.ArrayList;
+import p2peer.*;
 
-public class PeerProcess {
-	static int peerID; // This peer's ID.
-	static Logging logging = new Logging();
-	static ParseCommonConfig commonCfg = new ParseCommonConfig();
-	static ParsePeerInfoConfig peerCfg = new ParsePeerInfoConfig();
+public class peerProcess {
 	
 	public static boolean debug = false;
 	
@@ -30,34 +26,39 @@ public class PeerProcess {
 
 		
 		if(args.length == 2)
-			debug = true;
-		peerID = Integer.parseInt(args[0]);
+			PeerConnection.debug = true;
+		int peerID = Integer.parseInt(args[0]);
+		PeerConnection.myPeerID = peerID;
+		
 		
 		info("Starting peerProcess "+peerID);
 		
 		// Start the server
 		try {
 			info("Starting server...");
-			server = new Server(Integer.parseInt(peerCfg.get_host_values(peerID)[1]));
+			server = new Server(Integer.parseInt(PeerConnection.peerCfg.get_host_values(peerID)[1]));
 			info("Server started at "+
-			server.srvSocket.getInetAddress().getHostAddress()+':'+
-			server.srvSocket.getLocalPort());
+			server.getInetAddress().getHostName()+':'+
+			server.getPort());
 		} catch (NumberFormatException | IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		
 		// Read peerCFG and start connecting to other peers.
-		info("The peerCfg host list length is "+peerCfg.get_host_ids().length);
-		for (int i = 0; i < peerCfg.get_host_ids().length; i++) {
-			int otherPeerID = Integer.parseInt(peerCfg.get_host_ids()[i]);
+		info("The peerCfg host list length is " + 
+				PeerConnection.peerCfg.get_host_ids().length);
+		
+		for (int i = 0; i < PeerConnection.peerCfg.get_host_ids().length; i++) {
+			int otherPeerID = Integer.parseInt(
+					PeerConnection.peerCfg.get_host_ids()[i]);
 			// When I find my own peerID, stop.
 			info("Reading config for peerID "+otherPeerID);
 			if (otherPeerID == peerID) {
 				info("This is my peerID!");
 				break;
 			}
-			String [] values = peerCfg.get_host_values(otherPeerID);
+			String [] values = PeerConnection.peerCfg.get_host_values(otherPeerID);
 			
 			// convert values to appropriate form
 			String host = values[0];
@@ -102,14 +103,8 @@ public class PeerProcess {
 		}
 		info("All done!");
 	}
-	
-	static void info(String str) {
-		if(debug)
-			System.out.println("["+peerID+"] "+str);
+
+	public static void info(String str) {
+		PeerConnection.info(str);
 	}
-	public static void info(String str, int id) {
-		if(debug)
-			System.out.println("["+peerID+" -> "+id+"] "+str);	
-	}
-	
 }

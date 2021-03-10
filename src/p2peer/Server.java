@@ -6,6 +6,7 @@
 package p2peer;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ public class Server extends Thread {
 	public static ArrayList<Handler> handlers = new ArrayList<Handler>();
 	ServerSocket srvSocket;
 	
-	Server(int port) throws IOException{
+	public Server(int port) throws IOException{
 		srvSocket = new ServerSocket(port);
 		this.start();
 	}
@@ -40,6 +41,12 @@ public class Server extends Thread {
 	public boolean isClosed() {
 		return srvSocket.isClosed();
 	}
+	public InetAddress getInetAddress() {
+		return srvSocket.getInetAddress();
+	}
+	public int getPort() {
+		return srvSocket.getLocalPort();
+	}
 	
 }
 
@@ -56,20 +63,22 @@ class Handler extends PeerConnection {
 		while(!socket.isClosed()) {
 			//Need to get the peer id of the connecting process.
 			try {
-				PeerProcess.info("Incoming connection. Reading...");
-				peerID = Protocol.getHandshake(in);
+				info("Incoming connection. Reading...");
+				this.otherPeerID = Protocol.getHandshake(in);
 				//return the handshake
-				Protocol.putHandshake(out, PeerProcess.peerID);
+				Protocol.putHandshake(out, +myPeerID);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 			
 			// Log our connection.
-			PeerProcess.logging.tcp_connect_from(String.valueOf(PeerProcess.peerID), String.valueOf(peerID));
+			logging.tcp_connect_from(
+					String.valueOf(myPeerID), 
+					String.valueOf(otherPeerID));
 			
 			// That's it for the demo. Close down this connection.
-			PeerProcess.info("Handshake established to "+peerID);
-			PeerProcess.info("Closing connection to "+peerID);
+			info("Handshake established to "+otherPeerID);
+			info("Closing connection to "+otherPeerID);
 			close();
 		}
 	}

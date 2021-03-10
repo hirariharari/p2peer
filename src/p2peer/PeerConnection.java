@@ -13,14 +13,22 @@ import java.io.IOException;
 import java.net.Socket;
 
 public class PeerConnection extends Thread{
+	// Static members for common details.
+	public static int myPeerID; // This peer's ID.
+	int otherPeerID; // The peer ID of the OTHER peerProcess.
+	public static Logging logging = new Logging();
+	public static ParseCommonConfig commonCfg = new ParseCommonConfig();
+	public static ParsePeerInfoConfig peerCfg = new ParsePeerInfoConfig();
+	public static boolean debug = false;
+	
+	
 	Socket socket; // Should be a unique socket for this connection.
-	int peerID; // The peer ID of the OTHER peerProcess.
-	boolean hasFile;
+	boolean hasFile; //Whether the other peer has the file.
 	
 	public BufferedInputStream in;
 	public BufferedOutputStream out;
 	
-	PeerConnection(Socket socket) throws IOException {
+	public PeerConnection(Socket socket) throws IOException {
 		this.socket = socket;
 		this.in = new BufferedInputStream(socket.getInputStream());
 		this.out = new BufferedOutputStream(socket.getOutputStream());
@@ -37,5 +45,23 @@ public class PeerConnection extends Thread{
 	}
 	public boolean isClosed() {
 		return socket.isClosed();
+	}
+	
+	/**
+	 * Utility function for logging to this peerProcess.
+	 * @param str
+	 */
+	public static void info(String str) {
+		if(debug)
+			System.out.println("["+myPeerID+"] "+str);
+	}
+	
+	/**
+	 * Utility function for logging to a specific thread.
+	 * @param str
+	 */
+	public void connInfo(String str) {
+		if(debug)
+			System.out.println("["+myPeerID+" -> "+otherPeerID+"] "+str);	
 	}
 }

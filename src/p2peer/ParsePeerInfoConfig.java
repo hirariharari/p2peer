@@ -14,7 +14,7 @@ public class ParsePeerInfoConfig
     private HashMap<String, String[]> config_values = new HashMap<String, String[]>();
     private ArrayList<String> host_ids = new ArrayList<String>();
     
-    ParsePeerInfoConfig()
+    public ParsePeerInfoConfig()
     {
         try {
             File config_file =  new File("PeerInfo.cfg");

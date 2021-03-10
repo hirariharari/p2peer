@@ -13,7 +13,7 @@ public class Client extends PeerConnection {
 	public Client(int peerID, String host, int port, boolean hasFile) throws UnknownHostException, IOException {
 		//set up connection and peerProcess variables here.
 		super(new Socket(host,port));
-		this.peerID = peerID;
+		this.otherPeerID = peerID;
 		this.hasFile = hasFile;
 		
 		this.start();
@@ -22,19 +22,19 @@ public class Client extends PeerConnection {
 		while(!socket.isClosed()) {
 			// Start with a handshake.
 			try {
-				PeerProcess.info("Sending handshake...",peerID);
-				Protocol.putHandshake(out, PeerProcess.peerID);
+				connInfo("Sending handshake...");
+				Protocol.putHandshake(out, myPeerID);
 				
 				// Expect a handshake back. We already have the peerID.
-				PeerProcess.info("Handshake sent. Receiving handshake...",peerID);
+				connInfo("Handshake sent. Receiving handshake...");
 				Protocol.getHandshake(in);
 				
 				// Log our connection.
-				PeerProcess.logging.tcp_connect_to(
-						String.valueOf(PeerProcess.peerID), String.valueOf(peerID));
+				logging.tcp_connect_to(
+						String.valueOf(myPeerID), String.valueOf(otherPeerID));
 				
 				// That's it for the demo. Close.
-				PeerProcess.info("All done.",peerID);
+				connInfo("Done with handshake.");
 				close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
