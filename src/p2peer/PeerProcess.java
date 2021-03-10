@@ -2,7 +2,7 @@
  * @author cwphang 
  * 
  * PeerProcess implementation.
- * It is be able to:
+ * It is able to:
  *   read Common.cfg and PeerInfo.cfg and set up initial variables
  *   start its own listening server
  *   read PeerInfo.cfg and set up a list of peers to connect to
