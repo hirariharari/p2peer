@@ -8,31 +8,48 @@
  */
 
 package p2peer;
-import java.io.File;
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 public class PeerProcess {
-
-	static Server server; // This peer's server connection
-	static ArrayList<PeerConnection> connections; // A list of connected peers.
 	static int peerID; // This peer's ID.
-	static FileWrapper filewrapper; // A FileWrapper object for the file of interest.
 	static Logging logging = new Logging();
 	static ParseCommonConfig commonCfg = new ParseCommonConfig();
 	static ParsePeerInfoConfig peerCfg = new ParsePeerInfoConfig();
-	public static final boolean debug = true;
+	
+	public static boolean debug = true;
 	
 	public static void main(String[] args) {
+		Server server = null; // This peer's server connection
+		ArrayList<PeerConnection> connections = 
+				new ArrayList<PeerConnection>(); // A list of connected peers.
+		// FileWrapper filewrapper; // A FileWrapper object for the file of interest.
+
+		
+		if(args.length == 2)
+			debug = true;
 		peerID = Integer.parseInt(args[0]);
+		
+		info("Starting peerProcess "+peerID);
+		
+		// Start the server
+		try {
+			info("Starting server...");
+			server = new Server(Integer.parseInt(peerCfg.get_host_values(peerID)[1]));
+			info("Server started at "+
+			server.srvSocket.getInetAddress().getHostAddress()+':'+
+			server.srvSocket.getLocalPort());
+		} catch (NumberFormatException | IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		
 		// Read peerCFG and start connecting to other peers.
 		info("The peerCfg host list length is "+peerCfg.get_host_ids().length);
 		for (int i = 0; i < peerCfg.get_host_ids().length; i++) {
 			int otherPeerID = Integer.parseInt(peerCfg.get_host_ids()[i]);
 			// When I find my own peerID, stop.
-			info("This peerID is "+otherPeerID);
+			info("Reading config for peerID "+otherPeerID);
 			if (otherPeerID == peerID) {
 				info("This is my peerID!");
 				break;
@@ -45,22 +62,52 @@ public class PeerProcess {
 			boolean hasFile = (values[2].equals("1") ? true : false);
 			
 			info("Starting client for "+otherPeerID);
-			Client client;
 			try {
-				client = new Client(otherPeerID, host, port, hasFile);
-				connections.add(client);
+				connections.add((PeerConnection)new Client(otherPeerID, host, port, hasFile));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
 		}
-		info("Done!");
+		
+		info("press enter to close this demo:");
+		try {
+			System.in.read();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+				
+		info("Closing server...");
+		try {
+			info(server.getState().toString());
+			server.close();
+			server.join();
+		} catch (InterruptedException e) {
+			
+			e.printStackTrace();
+		}
+		info("Waiting for all connections to close...");
+		for (PeerConnection conn : connections) {
+			try {
+				conn.close();
+				conn.join();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		info("All done!");
 	}
 	
 	static void info(String str) {
 		if(debug)
-			System.out.println(str);
+			System.out.println("["+peerID+"] "+str);
+	}
+	public static void info(String str, int id) {
+		if(debug)
+			System.out.println("["+peerID+" -> "+id+"] "+str);	
 	}
 	
 }

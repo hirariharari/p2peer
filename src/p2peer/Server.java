@@ -4,56 +4,69 @@
  */
 package p2peer;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
 public class Server extends Thread {
-	public static ArrayList<Handler> handlers;
+	public static ArrayList<Handler> handlers = new ArrayList<Handler>();
 	ServerSocket srvSocket;
+	
 	Server(int port) throws IOException{
 		srvSocket = new ServerSocket(port);
+		this.start();
 	}
+	
 	public void run() {
 		while(!srvSocket.isClosed()) {
 			try {
-				Socket socket = srvSocket.accept();
-				handlers.add(new Handler(socket));
+				handlers.add(new Handler(srvSocket.accept()));
 			} catch (IOException e) {
 				// Socket was closed.
 			}
-			
 		}
 	}
+	
 	public void close() {
 		try {
 			srvSocket.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// We don't actually care if this fails, because the socket
+			//would be closed.
 		}
 	}
+	public boolean isClosed() {
+		return srvSocket.isClosed();
+	}
+	
 }
 
+
+
+
 class Handler extends PeerConnection {
-	Handler(Socket socket){
+	Handler(Socket socket) throws IOException{
 		// set up connection and peerConnection variables here.
 		super(socket);
-		this.run();
+		run();
 	}
 	public void run() {
-		//Need to get the peer id of the connecting process.
-		try {
-			BufferedInputStream in = new BufferedInputStream(socket.getInputStream());
-			BufferedOutputStream out = new BufferedOutputStream(socket.getOutputStream());
-			peerID = Protocol.getHandshake(in);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		while(!socket.isClosed()) {
+			//Need to get the peer id of the connecting process.
+			try {
+				PeerProcess.info("Incoming connection. Reading...");
+				peerID = Protocol.getHandshake(in);
+				//return the handshake
+				Protocol.putHandshake(out, PeerProcess.peerID);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			// That's it for the demo. Close down this connection.
+			PeerProcess.info("Handshake established to "+peerID);
+			PeerProcess.info("Closing connection to "+peerID);
+			close();
 		}
-		
 	}
 }

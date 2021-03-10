@@ -80,7 +80,7 @@ public class Protocol {
 	static byte[] intToBytes(int message) {
 		byte[] bytes = new byte[4];
 		ByteBuffer buf = ByteBuffer.allocate(4).putInt(message);
-		System.arraycopy(buf, 0, bytes, 0, 4);
+		System.arraycopy(buf.array(), 0, bytes, 0, 4);
 		return bytes;
 	}
 	

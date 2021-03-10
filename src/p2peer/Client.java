@@ -12,6 +12,30 @@ public class Client extends PeerConnection {
 	public Client(int peerID, String host, int port, boolean hasFile) throws UnknownHostException, IOException {
 		//set up connection and peerProcess variables here.
 		super(new Socket(host,port));
-		this.run();
+		this.peerID = peerID;
+		this.hasFile = hasFile;
+		
+		this.start();
+	}
+	public void run() {
+		while(!socket.isClosed()) {
+			// Start with a handshake.
+			try {
+				PeerProcess.info("Sending handshake...",peerID);
+				Protocol.putHandshake(out, PeerProcess.peerID);
+				
+				// Expect a handshake back. We already have the peerID.
+				PeerProcess.info("Handshake sent. Receiving handshake...",peerID);
+				Protocol.getHandshake(in);
+				
+				// That's it for the demo. Close.
+				//TODO: Make this do something.
+				PeerProcess.info("All done.",peerID);
+				close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 }
