@@ -28,8 +28,11 @@ public class Client extends PeerConnection {
 				PeerProcess.info("Handshake sent. Receiving handshake...",peerID);
 				Protocol.getHandshake(in);
 				
+				// Log our connection.
+				PeerProcess.logging.tcp_connect_to(
+						String.valueOf(PeerProcess.peerID), String.valueOf(peerID));
+				
 				// That's it for the demo. Close.
-				//TODO: Make this do something.
 				PeerProcess.info("All done.",peerID);
 				close();
 			} catch (IOException e) {

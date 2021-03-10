@@ -17,7 +17,7 @@ public class PeerProcess {
 	static ParseCommonConfig commonCfg = new ParseCommonConfig();
 	static ParsePeerInfoConfig peerCfg = new ParsePeerInfoConfig();
 	
-	public static boolean debug = true;
+	public static boolean debug = false;
 	
 	public static void main(String[] args) {
 		Server server = null; // This peer's server connection
@@ -81,7 +81,6 @@ public class PeerProcess {
 				
 		info("Closing server...");
 		try {
-			info(server.getState().toString());
 			server.close();
 			server.join();
 		} catch (InterruptedException e) {

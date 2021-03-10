@@ -63,6 +63,9 @@ class Handler extends PeerConnection {
 				e.printStackTrace();
 			}
 			
+			// Log our connection.
+			PeerProcess.logging.tcp_connect_from(String.valueOf(PeerProcess.peerID), String.valueOf(peerID));
+			
 			// That's it for the demo. Close down this connection.
 			PeerProcess.info("Handshake established to "+peerID);
 			PeerProcess.info("Closing connection to "+peerID);

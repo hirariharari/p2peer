@@ -49,8 +49,7 @@ public class Message {
 	
 	public Message(Message.MessageType type, byte[] payload) {
 		this.type = type;
-		this.payload = ByteBuffer.allocate(payload.length);
-		this.payload.put(payload);
+		this.payload = ByteBuffer.wrap(payload);
 	}
 	
 	public Message(Message.MessageType type, ByteBuffer payload) {
