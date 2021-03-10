@@ -18,6 +18,6 @@ public class FileWrapper {
 	
 	File file;
 	
-	FileWrapper(File file, boolean hasFile){
+	public FileWrapper(File file, boolean hasFile){
 	}
 }
