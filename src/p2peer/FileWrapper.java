@@ -3,7 +3,7 @@
  * can package segments of a file for sending, and can piece together a complete
  * file from segments received.
  */
-package p2peer;
+package src.p2peer;
 
 import java.io.File;
 import java.io.FileReader;

@@ -1,7 +1,7 @@
 /**
  * @author cwphang@ufl.edu
  */
-package p2peer;
+package src.p2peer;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;

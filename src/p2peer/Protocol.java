@@ -13,7 +13,7 @@
  * @see BufferedInputStream
  * @see BufferedOutputStream
  */
-package p2peer;
+package src.p2peer;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -133,6 +133,7 @@ public class Protocol {
 		System.arraycopy(buf.array(), 28, peerID.array(), 0, 4);
 		return peerID.getInt();
 	}
+	
 	public static void putHandshake(BufferedOutputStream out, int peerID) throws IOException {
 		byte[] encodedHandshake = encodeHandshake(peerID);
 		out.write(encodedHandshake);

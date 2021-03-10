@@ -2,9 +2,26 @@
  * TODO(pkakaraparti/kai.zhang): Implement a server process that can accept 
  * incoming requests.
  */
-package p2peer;
-public class Server {
-	Server(String hostname, int port, PeerProcess peerProcess){}
+
+import java.io.IOException;
+import java.net.ServerSocket;
+
+package src.p2peer;
+public class Server extends Thread {
+	Server(String hostname, int port, PeerProcess peerProcess){
+		ServerSocket srvSocket;
+	Server(int port) throws IOException{
+		srvSocket = new ServerSocket(port);
+	}
+	public void run() {
+		while(!srvSocket.isClosed()) {
+			Socket socket = srvSocket.accept();
+			
+		}
+	}
+	public void close() {
+		srvSocket.close();
+	}
 
 }
 
