@@ -14,7 +14,7 @@
  * @see BufferedInputStream
  * @see BufferedOutputStream
  */
-package src.p2peer;
+package p2peer;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

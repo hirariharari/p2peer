@@ -3,7 +3,7 @@
  * 
  * A simple container for a message.
  */
-package src.p2peer;
+package p2peer;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;

@@ -5,7 +5,7 @@
  * notifying the client or server socket that spawned it.
  */
 
-package src.p2peer;
+package p2peer;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

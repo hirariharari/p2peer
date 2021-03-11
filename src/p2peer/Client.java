@@ -31,7 +31,7 @@ public class Client extends PeerConnection {
 				
 				// Log our connection.
 				logging.tcp_connect_to(
-						String.valueOf(myPeerID), String.valueOf(otherPeerID));
+						myPeerID, otherPeerID);
 				
 				// That's it for the demo. Close.
 				connInfo("Done with handshake.");

@@ -73,8 +73,8 @@ class Handler extends PeerConnection {
 			
 			// Log our connection.
 			logging.tcp_connect_from(
-					String.valueOf(myPeerID), 
-					String.valueOf(otherPeerID));
+					myPeerID, 
+					otherPeerID);
 			
 			// That's it for the demo. Close down this connection.
 			info("Handshake established to "+otherPeerID);
