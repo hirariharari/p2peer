@@ -1,7 +1,9 @@
 /**
- * @author cwphang@ufl.edu
+ * @author cwphang
+ * 
+ * A simple container for a message.
  */
-package p2peer;
+package src.p2peer;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
@@ -49,8 +51,7 @@ public class Message {
 	
 	public Message(Message.MessageType type, byte[] payload) {
 		this.type = type;
-		this.payload = ByteBuffer.allocate(payload.length);
-		this.payload.put(payload);
+		this.payload = ByteBuffer.wrap(payload);
 	}
 	
 	public Message(Message.MessageType type, ByteBuffer payload) {

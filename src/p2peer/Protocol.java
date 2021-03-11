@@ -1,5 +1,6 @@
 /**
- * @author cwphang@ufl.edu
+ * @author cwphang
+ * 
  * The message protocol used by the project.
  * This will contain the message headers and enums needed for a message
  * as well as the methods for encoding and decoding headers and messages
@@ -13,7 +14,7 @@
  * @see BufferedInputStream
  * @see BufferedOutputStream
  */
-package p2peer;
+package src.p2peer;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -38,13 +39,81 @@ public class Protocol {
 		}
 	}
 
+	
+	/**
+	 * Returns a peer ID obtained from a handshake.
+	 * @param in	The buffered input stream to read from.
+	 * @return		The peerID sent from this handshake.
+	 * @throws IOException
+	 */
+	public static int getHandshake(BufferedInputStream in) throws IOException {
+		ByteBuffer buf = ByteBuffer.allocate(32);
+		in.read(buf.array());
+		
+		// TODO: Make it so this cares that the rest of the message is correct.
+		
+		ByteBuffer peerID = ByteBuffer.allocate(4);
+		System.arraycopy(buf.array(), 28, peerID.array(), 0, 4);
+		return peerID.getInt();
+	}
+	
+	/**
+	 * Write a handshake with a given peerID to a BufferedOutputStream.
+	 * @param out		The output stream to use.
+	 * @param peerID	The peerID to send in the handshake.
+	 * @throws IOException
+	 */
+	public static void putHandshake(BufferedOutputStream out, int peerID) throws IOException {
+		byte[] encodedHandshake = encodeHandshake(peerID);
+		out.write(encodedHandshake);
+		out.flush();
+		
+	}
+	
+	/**
+	 * Returns the message type obtained from a peer, plus the payload if
+	 * applicable.
+	 * 
+	 * @param in	The buffered input stream to read from.
+	 * @return		A message.
+	 * @throws IOException
+	 */
+	public static Message getMessage(BufferedInputStream in) throws IOException {
+		ByteBuffer msgHeader = ByteBuffer.allocate(5);
+		in.read(msgHeader.array());
+		
+		int length = msgHeader.getInt();
+		Message.MessageType type = Message.MessageType.getMessageType(msgHeader.get());
+		
+		if (length <= 0) {
+			return new Message(type);
+		}
+		else {
+			ByteBuffer msgBody = ByteBuffer.allocate(length);
+			return new Message(type,msgBody);
+		}
+	}
+	
+	/**
+	 * Write a message to a BufferedOutputStream.
+	 * @param out		The output stream to use.
+	 * @param msg		The message to write.
+	 * @throws IOException
+	 */
+	public static void putMessage(BufferedOutputStream out, Message msg) throws IOException {
+		byte[] encodedMessage = encodeMessage(msg);
+		out.write(encodedMessage);
+		out.flush();
+	}
+	
+	
 	/**
 	 * Return a 32 byte array header using this message's peerID.
 	 * 
 	 * @param peerID	The peer ID to use with this message
 	 * @return 			A 32 byte array with the handshake message.
 	 */
-	public static byte[] encodeHandshake(int peerID) {
+	private static byte[] encodeHandshake(int peerID) {
 		byte[] handshake = new byte[32];
 
 		// Generate a 4 byte array with the peerID, with leading 0s.
@@ -77,24 +146,13 @@ public class Protocol {
 	 * @param message 	The integer to convert.
 	 * @return 			A byte array representation of that integer.
 	 */
-	static byte[] intToBytes(int message) {
+	private static byte[] intToBytes(int message) {
 		byte[] bytes = new byte[4];
 		ByteBuffer buf = ByteBuffer.allocate(4).putInt(message);
-		System.arraycopy(buf, 0, bytes, 0, 4);
+		System.arraycopy(buf.array(), 0, bytes, 0, 4);
 		return bytes;
 	}
 	
-	/**
-	 * Convert a byte representation of an integer value into an integer. 
-	 * 
-	 * @param bytes	The byte representation of the integer to return.
-	 * @return		An integer.
-	 */
-	static int bytesToInt(byte[] bytes) {
-		ByteBuffer buf = ByteBuffer.allocate(4);
-		System.arraycopy(bytes, 0, buf.array(), 0, 4);
-		return buf.getInt();
-	}
 	
 	/**
 	 * Wrap a message payload with a header.
@@ -102,7 +160,7 @@ public class Protocol {
 	 * @param message 	The message to encode.
 	 * @return			A byte array representation of the message.
 	 */
-	static byte[] encodeMessage(Message message) {
+	private static byte[] encodeMessage(Message message) {
 		byte[] messageBytes = new byte[5+message.payload.array().length];
 		
 		byte[] lengthBytes = intToBytes(message.payload.array().length);
@@ -110,66 +168,10 @@ public class Protocol {
 		
 		System.arraycopy(lengthBytes, 0, messageBytes, 0, 4);
 		System.arraycopy(messageType, 0, messageBytes, 4, 1);
-		System.arraycopy(message.payload, 0, messageBytes, 5, 
+		System.arraycopy(message.payload.array(), 0, messageBytes, 5, 
 				message.payload.array().length);
 		
 		return messageBytes;
 		
 	}
-<<<<<<< HEAD
-	
-	/**
-	 * Returns a peer ID obtained from a handshake.
-	 * @param in	The buffered input stream to read from.
-	 * @return		The peerID sent from this handshake.
-	 * @throws IOException
-	 */
-	public static int getHandshake(BufferedInputStream in) throws IOException {
-		ByteBuffer buf = ByteBuffer.allocate(32);
-		in.read(buf.array());
-		
-		// TODO: Make it so this cares that the rest of the message is correct.
-		
-		ByteBuffer peerID = ByteBuffer.allocate(4);
-		System.arraycopy(buf.array(), 28, peerID.array(), 0, 4);
-		return peerID.getInt();
-	}
-	public static void putHandshake(BufferedOutputStream out, int peerID) throws IOException {
-		byte[] encodedHandshake = encodeHandshake(peerID);
-		out.write(encodedHandshake);
-		out.flush();
-		
-	}
-	
-	/**
-	 * Returns the message type obtained from a peer, plus the payload if
-	 * applicable.
-	 * 
-	 * @param in	The buffered input stream to read from.
-	 * @return		A message.
-	 * @throws IOException
-	 */
-	public static Message getMessage(BufferedInputStream in) throws IOException {
-		ByteBuffer msgHeader = ByteBuffer.allocate(5);
-		in.read(msgHeader.array());
-		
-		int length = msgHeader.getInt();
-		Message.MessageType type = Message.MessageType.getMessageType(msgHeader.get());
-		
-		if (length <= 0) {
-			return new Message(type);
-		}
-		else {
-			ByteBuffer msgBody = ByteBuffer.allocate(length);
-			return new Message(type,msgBody);
-		}
-	}
-	
-	public static void putMessage(BufferedOutputStream out, Message msg) throws IOException {
-		byte[] encodedMessage = encodeMessage(msg);
-		out.write(encodedMessage);
-		out.flush();
-	}
-=======
->>>>>>> parent of 08fb8c3 (Revert "unmessing protocol")
 }
