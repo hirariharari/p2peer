@@ -3,7 +3,7 @@
  * 
  * The client interface for the project.
  */
-package src.p2peer;
+package p2peer;
 
 import java.io.IOException;
 import java.net.Socket;
