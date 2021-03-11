@@ -1,10 +1,5 @@
-/**
- * @author pkakaraparti
- * 
- * The peer Log object to which log messages are written 
- */
-
-package p2peer;
+//The peer Log object to which log messages are written 
+package src.p2peer;
 
 import java.io.File;
 import java.io.FileWriter;

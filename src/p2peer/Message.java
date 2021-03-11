@@ -1,7 +1,5 @@
 /**
- * @author cwphang
- * 
- * A simple container for a message.
+ * @author cwphang@ufl.edu
  */
 package src.p2peer;
 
@@ -51,7 +49,8 @@ public class Message {
 	
 	public Message(Message.MessageType type, byte[] payload) {
 		this.type = type;
-		this.payload = ByteBuffer.wrap(payload);
+		this.payload = ByteBuffer.allocate(payload.length);
+		this.payload.put(payload);
 	}
 	
 	public Message(Message.MessageType type, ByteBuffer payload) {

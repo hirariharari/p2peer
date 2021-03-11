@@ -1,7 +1,4 @@
-/**
- * @author pkakaraparti
- */
-package p2peer;
+package src.p2peer;
 
 import java.io.*;
 import java.util.HashMap;
@@ -9,7 +6,7 @@ import java.util.HashMap;
 public class ParseCommonConfig 
 {   
     private HashMap<String, String> config_values = new HashMap<String, String>();
-    public ParseCommonConfig()
+    ParseCommonConfig()
     {
         try {
             File config_file =  new File("Common.cfg");
