@@ -6,3 +6,4 @@ Test.*
 *.prefs
 .project
 .classpath
+*.zip
