@@ -6,7 +6,6 @@ package p2peer;
 import java.io.*;
 import java.util.HashMap;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class ParsePeerInfoConfig 
 {   
