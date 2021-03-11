@@ -19,4 +19,4 @@ Instructions for Eclipse IDE 2020-12, adapt to your own version if necessary.
 * You should see a new project named p2peer.
 ## Troubleshooting
 Must declare a named package
-	* In your project explorer, delete src/module-info.java.
+* In your project explorer, delete src/module-info.java.
