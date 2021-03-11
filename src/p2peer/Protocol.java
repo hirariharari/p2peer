@@ -116,6 +116,7 @@ public class Protocol {
 		return messageBytes;
 		
 	}
+<<<<<<< HEAD
 	
 	/**
 	 * Returns a peer ID obtained from a handshake.
@@ -169,4 +170,6 @@ public class Protocol {
 		out.write(encodedMessage);
 		out.flush();
 	}
+=======
+>>>>>>> parent of 08fb8c3 (Revert "unmessing protocol")
 }
