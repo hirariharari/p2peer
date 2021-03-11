@@ -1,5 +1,4 @@
 //The peer Log object to which log messages are written 
-package src.p2peer;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -7,11 +6,8 @@ import java.io.FileWriter;
 public class PeerLog {
     FileWriter fw;
 
-    /**
-     * Opening the file (or creating if it doesn't exist) using peer_id
-     * @param peer_id Peer ID to open/create log file
-     */
-    public PeerLog(int peer_id)
+    //opening the file (or creating if it doesn't exist) using peer id
+    public PeerLog(String peer_id)
     {
         try
         {
@@ -28,10 +24,7 @@ public class PeerLog {
         }
     }
     
-    /**
-     * Write the log message to log file and then close
-     * @param str Message to be written to log
-     */
+    //write the log message to log file and then close
     public void write_close(String str)
     {
         try

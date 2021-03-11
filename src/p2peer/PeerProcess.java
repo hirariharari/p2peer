@@ -7,7 +7,7 @@
  *   connect to peers earlier than itself on the PeerInfo.cfg list
  */
 
-package src.p2peer;
+package p2peer;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
