@@ -1,9 +1,13 @@
 *.class
 *.log
 Test.*
+*.cfg
 
 /bin/
 *.prefs
 .project
 .classpath
 *.zip
+
+peerProcessTest.java
+
