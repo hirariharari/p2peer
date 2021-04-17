@@ -146,7 +146,7 @@ public class Protocol {
 	 * @param message 	The integer to convert.
 	 * @return 			A byte array representation of that integer.
 	 */
-	private static byte[] intToBytes(int message) {
+	static byte[] intToBytes(int message) {
 		byte[] bytes = new byte[4];
 		ByteBuffer buf = ByteBuffer.allocate(4).putInt(message);
 		System.arraycopy(buf.array(), 0, bytes, 0, 4);

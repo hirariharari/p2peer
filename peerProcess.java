@@ -64,6 +64,11 @@ public class peerProcess {
 			String host = values[0];
 			int port = Integer.parseInt(values[1]);
 			boolean hasFile = (values[2].equals("1") ? true : false);
+
+			//set some variables
+			int file_size = PeerConnection.commonCfg.get_file_size();
+			int piece_size = PeerConnection.commonCfg.get_piece_size();
+			int num_pieces = (int)Math.ceil(file_size/piece_size);
 			
 			info("Starting client for "+otherPeerID);
 			try {

@@ -24,6 +24,7 @@ public class PeerConnection extends Thread{
 	
 	Socket socket; // Should be a unique socket for this connection.
 	boolean hasFile; //Whether the other peer has the file.
+	FileWrapper file_wrapper; //FileWrapper object for this peer
 	
 	public BufferedInputStream in;
 	public BufferedOutputStream out;
