@@ -14,7 +14,7 @@ import java.net.Socket;
 
 public class PeerConnection extends Thread{
 	// Static members for common details.
-	public static int myPeerID; // This peer's ID.
+	public int myPeerID; // This peer's ID.
 	int otherPeerID; // The peer ID of the OTHER peerProcess.
 	public static Logging logging = new Logging();
 	public static ParseCommonConfig commonCfg = new ParseCommonConfig();

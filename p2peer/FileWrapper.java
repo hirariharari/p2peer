@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -26,38 +28,53 @@ public class FileWrapper {
 	 * @param subFiles  An array of files, each representing a piece of the original  
 	 */
 	
+	boolean hasFile;
+	PeerConnection peer;
+
 	 //some variables
 	int fileSize = PeerConnection.commonCfg.get_file_size();
 	int pieceSize = PeerConnection.commonCfg.get_piece_size();
 	int pieceNum = fileSize/pieceSize + (fileSize%pieceSize==0?0:1);
 
-	File file;
+	//TODO: check if paths are correct, find some way to get the ACTUAL file name 
+	Path projectDir = Paths.get("").toAbsolutePath().getParent();
+	String peer_name = "peer_" + peer.myPeerID;
+    Path peerDir = Paths.get(projectDir + "/"+ peer_name).toAbsolutePath(); 
+
+	File file = new File(peerDir + "temp_file_name");
 	File[] subFiles = new File[pieceNum];
-	boolean hasFile;
-	PeerConnection peer;
+	
 
 	public FileWrapper() {}
 
+	//if the peer starts with the File, initialize it
 	public FileWrapper(PeerConnection peer, File file, boolean hasFile)
 	{
 		this.peer = peer;
 		this.file = file;
 		this.hasFile = hasFile;
-		initialization(this.file);
+		initialization();
+	}
+
+	//if the peer doesn't start with the file, we need to create one
+	public FileWrapper(PeerConnection peer, boolean hasFile)
+	{
+		this.peer = peer;
+		this.hasFile = hasFile;
+		initialization();
 	}
 
 	/**
 	 * If a peer has a complete file, call this method to initialize.
-	 * @param file
 	 */
-	public void initialization(File file){
+	public void initialization(){
 		//if this peer has the entire file, divide it up into sub files
 		if(hasFile)
 		{
 			try 
 			{	
 				//first, represent the file as a byte array
-				byte[] file_byte_array = Files.readAllBytes(file.toPath());
+				byte[] file_byte_array = Files.readAllBytes(this.file.toPath());
 				//now populate the subfiles
 				int i,j;
 				int start_index = 0;
@@ -68,8 +85,9 @@ public class FileWrapper {
 					byte[] subFile = Files.readAllBytes(subFiles[i].toPath());
 					for(j = start_index; j <= end_index; j++)
 					{
-						subFile[j] = file_byte_array[j];
+						subFile[j - start_index] = file_byte_array[j];
 					} 
+					Files.write(subFiles[i].toPath(), subFile);
 					start_index += pieceSize;
 					//last piece may not be full
 					if(i == pieceNum - 2) //next i will be last piece
@@ -88,6 +106,7 @@ public class FileWrapper {
 		{	
 			for(int i = 0; i < subFiles.length; i++)
 				subFiles[i] = null;
+
 		}
 	}
 
@@ -119,6 +138,58 @@ public class FileWrapper {
 		subFiles[pieceIndex] = subFile;
 	}
 
+
+	/**	
+	 * Check if the peer has all the subfiles. If it does, then combine them all into a
+	 * single file and update peer's hasFile
+	 */
+	public void check_combine_subfiles()
+	{	
+		//check if any subfile is null
+		boolean incomplete_file = false;
+		for(int i = 0; i < subFiles.length; i++ )
+			if(subFiles[i] == null)
+				incomplete_file = true;
+		//if the subfiles are all present with data
+		//we take that to mean that the peer has all the pieces		
+		if(!incomplete_file)
+		{	
+			try 
+			{
+				byte[] file_byte_array = Files.readAllBytes(file.toPath());
+				int i,j;
+				int start_index =0;
+				int end_index = pieceSize -1;
+				for(i=0; i< subFiles.length; i++)
+				{
+					byte[] subFile = Files.readAllBytes(subFiles[i].toPath());
+					for(j=start_index; j<=end_index; j++)
+					{
+						file_byte_array[j] = subFile[j - start_index];
+					}
+					start_index += pieceSize;
+					//last piece may not be full
+					if(i == pieceNum - 2) //next i will be last piece
+						end_index += file_byte_array.length - 1;
+					else	
+						end_index += pieceSize;
+				}
+				
+				//write the file byte array to the file and update hasFile
+				Files.write(file.toPath(), file_byte_array);
+				hasFile = true;
+				
+			} 
+			catch (Exception e) 
+			{
+				e.printStackTrace();			
+			}
+			
+		}
+				
+	}
+
+
 	/**
 	 * Extract the piece data from the piece Message and handle it
 	 * @param piece_message The piece Message receieved by the peer through in
@@ -142,6 +213,8 @@ public class FileWrapper {
 			try 
 			{
 				Files.write(subFiles[piece_index].toPath(), piece_data);
+				//check if the peer has all the subfiles at this point, to combine them 
+				check_combine_subfiles();
 
 			} 
 			catch (Exception e) 
