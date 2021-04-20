@@ -73,7 +73,6 @@ class Handler extends PeerConnection {
 		run();
 	}
 	public void run() {
-        // TODO Check the logic of the loop.
         //Need to get the peer id of the connecting process.
         try {
             info("Incoming connection. Reading...");
@@ -104,7 +103,6 @@ class Handler extends PeerConnection {
 	@Override
     public void handleMsg(Message msg) {
         super.handleMsg(msg);
-        // Behaviors of receiving bitfield of server and client are different.
         if (msg.type == Message.MessageType.bitfield) {
             List<Integer> defectSubFiles = file_wrapper.getDefectSubFiles();
             int pieceNum = file_wrapper.pieceNum;
@@ -119,7 +117,7 @@ class Handler extends PeerConnection {
                     temp[i] = 0;
                 }
                 for (int i = 0; i < lenOfByteArray; i++) {
-                    int begin = i * 8; //TODO: begin is never used.
+                    //int begin = i * 8;
                     for (int j = 0; j < 8; j++) {
                         msgPayload[i] = (byte) (msgPayload[i] + (1 << (7 - j)));
                     }

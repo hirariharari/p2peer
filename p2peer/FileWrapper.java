@@ -194,14 +194,14 @@ public class FileWrapper {
 
 	/**
 	 * Extract the piece data from the piece Message and handle it
-	 * @param piece_message The piece Message receieved by the peer through in
+	 * @param piece_message The piece Message received by the peer through in
 	 */
 	public void receive_piece_message(Message piece_message)
 	{
-		//if the recieved message is indeed a piece message
+		//if the received message is indeed a piece message
 		if(piece_message.type == MessageType.piece)
 		{
-			//TODO: check if any problems caused by manipulaitng bytebuffer or is it better to copy it first?
+			//TODO: check if any problems caused by manipulating bytebuffer or is it better to copy it first?
 			
 			//assign the piece index (bytebuffer is moved)
 			int piece_index = piece_message.payload.getInt();

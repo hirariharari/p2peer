@@ -71,7 +71,7 @@ public class Client extends PeerConnection {
 			temp[i] = 0;
 		}
 		for (int i = 0; i < lenOfByteArray; i++) {
-			int begin = i * 8; //TODO: begin is never used.
+			//int begin = i * 8;
 			for (int j = 0; j < 8; j++) {
 				msgPayload[i] = (byte) (msgPayload[i] + (1 << (7 - j)));
 			}
@@ -83,7 +83,6 @@ public class Client extends PeerConnection {
 	@Override
 	public void handleMsg(Message msg) {
 		super.handleMsg(msg);
-		// Behaviors of receiving bitfield of server and client are different.
 		if (msg.type == Message.MessageType.bitfield) {
 			List<Integer> defectSubFiles = file_wrapper.getDefectSubFiles();
 			int pieceNum = file_wrapper.pieceNum;
