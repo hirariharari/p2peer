@@ -30,7 +30,7 @@ public class peerProcess {
 		if(args.length == 2)
 			PeerConnection.debug = true;
 		int peerID = Integer.parseInt(args[0]);
-		PeerConnection.myPeerID = peerID; //TODO Compile Error
+		PeerConnection.myPeerID = peerID;
 		
 		
 		info("Starting peerProcess "+peerID);
@@ -43,7 +43,7 @@ public class peerProcess {
 			server.getInetAddress().getHostName()+':'+
 			server.getPort());
 		} catch (NumberFormatException | IOException e1) {
-			// TODO Auto-generated catch block
+			// There was an issue reading the server's port number as an integer
 			e1.printStackTrace();
 		}
 		
@@ -76,7 +76,7 @@ public class peerProcess {
 			try {
 				connections.add((PeerConnection)new Client(otherPeerID, host, port, hasFile));
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				// There was an issue starting a client connection.
 				e.printStackTrace();
 			}
 			
@@ -168,7 +168,7 @@ public class peerProcess {
 		try {
 			System.in.read();
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
+			// There was an issue reading from system.in
 			e1.printStackTrace();
 		}
 				
@@ -177,7 +177,7 @@ public class peerProcess {
 			server.close();
 			server.join();
 		} catch (InterruptedException e) {
-			
+			// There was an issue closing the server.
 			e.printStackTrace();
 		}
 		info("Waiting for all connections to close...");
@@ -186,7 +186,7 @@ public class peerProcess {
 				conn.close();
 				conn.join();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
+				// There was an issue closing a connection.
 				e.printStackTrace();
 			}
 		}
