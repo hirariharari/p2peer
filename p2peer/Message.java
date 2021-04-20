@@ -35,6 +35,11 @@ public class Message {
 	public MessageType type;
 	public ByteBuffer payload;
 	
+	Message(Message copyfrom) {
+		this.type = copyfrom.type;
+		this.payload = copyfrom.payload.duplicate();
+	}
+	
 	public Message(Message.MessageType type) {
 		this(type, new byte [0]);
 	}
@@ -57,5 +62,9 @@ public class Message {
 	public Message(Message.MessageType type, ByteBuffer payload) {
 		this.type = type;
 		this.payload = payload;
+	}
+	
+	public int length() {
+		return payload.array().length;
 	}
 }
