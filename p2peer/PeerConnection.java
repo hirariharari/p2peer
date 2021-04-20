@@ -13,7 +13,7 @@ import java.util.*;
 
 public class PeerConnection extends Thread{
 	// Static members for common details.
-	public int myPeerID; // This peer's ID.
+	public static int myPeerID; // This peer's ID.
 	public int otherPeerID; // The peer ID of the OTHER peerProcess.
 	public static Logging logging = new Logging();
 	public static ParseCommonConfig commonCfg = new ParseCommonConfig();
