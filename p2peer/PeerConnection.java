@@ -25,8 +25,7 @@ public class PeerConnection extends Thread{
 	boolean hasFile; //Whether the other peer has the file.
 	public static FileWrapper file_wrapper; //FileWrapper object for this peer
 
-	// TODO initialize these variables during the peer process
-    // requestingPieceNums and neighbors should be shared by clients and server in the same machine.
+	// requestingPieceNums and neighbors should be shared by clients and server in the same machine.
 	public static List<Integer> requestingPieceNums = new ArrayList<Integer>();
 	public static Map<Integer,Long> neighborRates = new HashMap<Integer, Long>();// Value in this map is the time used
 	public static List<Integer> preferredNeighbors = new ArrayList<Integer>();

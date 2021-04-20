@@ -143,7 +143,20 @@ public class peerProcess {
 							e -> (!PeerConnection.preferredNeighbors.contains(e.getKey())) &&
 									PeerConnection.interestedNeighbors.contains(e.getKey())
 					).forEach(e -> candidate.add(e.getKey()));
-					PeerConnection.optNeighbor = candidate.get(new Random().nextInt(candidate.size()-1));
+					int originalOptNeighbor = PeerConnection.optNeighbor;
+					if (candidate.size() == 0) {
+						PeerConnection.optNeighbor = -1;
+					}
+					else if (candidate.size() == 1) {
+						if (candidate.contains(originalOptNeighbor)) {
+							PeerConnection.optNeighbor = -1;
+						}
+					}
+					else {
+						while (PeerConnection.optNeighbor == originalOptNeighbor) {
+							PeerConnection.optNeighbor = candidate.get(new Random().nextInt(candidate.size()-1));
+						}
+					}
 					for (PeerConnection conn :
 							connections) {
 						if (conn.otherPeerID == PeerConnection.optNeighbor){
@@ -206,7 +219,6 @@ public class peerProcess {
 			return 1;
 		}
 		else if (chokeList.contains(conn.otherPeerID)) {
-			//TODO Stop sending pieces.
 			Message sendMsg = new Message(Message.MessageType.choke);
 			conn.sendMsg(sendMsg);
 			return 0;
