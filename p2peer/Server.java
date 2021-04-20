@@ -112,7 +112,7 @@ class Handler extends PeerConnection {
                     temp[i] = 0;
                 }
                 for (int i = 0; i < lenOfByteArray; i++) {
-                    int begin = i * 8;
+                    int begin = i * 8; //TODO: begin is never used.
                     for (int j = 0; j < 8; j++) {
                         msgPayload[i] = (byte) (msgPayload[i] + (1 << (7 - j)));
                     }

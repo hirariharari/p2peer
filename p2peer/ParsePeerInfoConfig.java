@@ -26,6 +26,8 @@ public class ParsePeerInfoConfig
                 config_values.put(values[0], host_values);
                 host_ids.add(values[0]);
             }
+            
+            br.close();
         }
         catch (Exception err) 
         {

@@ -21,6 +21,8 @@ public class ParseCommonConfig
                 String values[] = str.split(" ", 2);
                 config_values.put(values[0], values[1]);
             }
+            
+            br.close();
         }
         catch (Exception err) 
         {

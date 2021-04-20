@@ -7,16 +7,11 @@
 package p2peer;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.nio.file.Files;
 import java.util.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import p2peer.Message.MessageType;
 
@@ -39,7 +34,7 @@ public class FileWrapper {
 
 	//TODO: check if paths are correct, find some way to get the ACTUAL file name 
 	Path projectDir = Paths.get("").toAbsolutePath().getParent();
-	String peer_name = "peer_" + peer.myPeerID;
+	String peer_name = "peer_" + PeerConnection.myPeerID;
     Path peerDir = Paths.get(projectDir + "/"+ peer_name).toAbsolutePath(); 
 
 	File file = new File(peerDir + "temp_file_name");

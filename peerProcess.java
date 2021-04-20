@@ -11,9 +11,7 @@
  */
 
 import java.io.IOException;
-import java.time.Period;
 import java.util.*;
-
 import p2peer.*;
 
 public class peerProcess {
@@ -70,7 +68,7 @@ public class peerProcess {
 			//set some variables
 			int file_size = PeerConnection.commonCfg.get_file_size();
 			int piece_size = PeerConnection.commonCfg.get_piece_size();
-			int num_pieces = (int)Math.ceil(file_size/piece_size);
+			int num_pieces = (int)Math.ceil(file_size/piece_size); //TODO: num_pieces is never used.
 			
 			info("Starting client for "+otherPeerID);
 			try {
