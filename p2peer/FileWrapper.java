@@ -110,9 +110,10 @@ public class FileWrapper {
 		//if this peer starts with no file, make the subfiles array into null
 		else
 		{	
-			for(int i = 0; i < subFiles.length; i++)
+			for(int i = 0; i < subFiles.length; i++) {
 				subFiles[i] = null;
 				defectSubFiles.add(i); // Initialization
+			}
 		}
 	}
 

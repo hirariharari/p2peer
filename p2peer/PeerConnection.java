@@ -1,11 +1,9 @@
 /**
  * @author kai
- * Implement Describe the behaviors of peers and how to handle all the messages
+ * Implement Describe the behaviors of peers to send messages and how to handle all the messages. Also how to update file and bitfields.
  */
 
 package p2peer;
-
-import com.sun.xml.internal.ws.api.model.MEP;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
