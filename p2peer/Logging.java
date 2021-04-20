@@ -141,6 +141,19 @@ public class Logging {
     String message = "Peer " + peer1 + " has downloaded the piece " + piece_index + " from " + peer2 + ". Now the number of pieces it has is " + no_of_pieces; 
     p.write_close(message);
    }
+   
+   /**
+    * Log message for piece download by peer
+    * @param peer1 Peer which downloads the piece
+    * @param peer2 Peer which uploads the piece
+    * @param no_of_pieces Number of pieces peer1 now has
+    */
+   public void download(int peer1, int peer2, int piece_index, int no_of_pieces)
+   {
+    PeerLog p = new PeerLog(peer1);
+    String message = "Peer " + peer1 + " has downloaded the piece " + piece_index + " from " + peer2 + ". Now the number of pieces it has is " + no_of_pieces; 
+    p.write_close(message);
+   }
 
    /**
     * Log message for download completion of total file

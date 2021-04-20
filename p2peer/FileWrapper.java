@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.nio.file.Files;
+import java.util.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -44,6 +45,11 @@ public class FileWrapper {
 	File file = new File(peerDir + "temp_file_name");
 	File[] subFiles = new File[pieceNum];
 	
+	public List<Integer> getDefectSubFiles() {
+        return defectSubFiles;
+    }
+
+    private List<Integer> defectSubFiles = new ArrayList<Integer>();
 
 	public FileWrapper() {}
 
@@ -106,7 +112,7 @@ public class FileWrapper {
 		{	
 			for(int i = 0; i < subFiles.length; i++)
 				subFiles[i] = null;
-
+				defectSubFiles.add(i); // Initialization
 		}
 	}
 
@@ -222,7 +228,8 @@ public class FileWrapper {
 				e.printStackTrace();
 			}
 
-			
+			// Update defect subFiles.
+			defectSubFiles.remove(defectSubFiles.indexOf(piece_index));
 		}
 	
 	}

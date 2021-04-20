@@ -1,5 +1,5 @@
 /**
- * @author cphang
+ * @author cphang, kai
  * 
  * A server process that can accept incoming requests.
  */
@@ -10,6 +10,8 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Server extends Thread {
 	public static ArrayList<Handler> handlers = new ArrayList<Handler>();
@@ -47,7 +49,18 @@ public class Server extends Thread {
 	public int getPort() {
 		return srvSocket.getLocalPort();
 	}
-	
+	public boolean allComplete() {
+        for (Handler h :
+                handlers) {
+            for (int i :
+                    h.getNeighborBitfield()) {
+                if (i != 1) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 }
 
 
@@ -75,11 +88,38 @@ class Handler extends PeerConnection {
 			logging.tcp_connect_from(
 					myPeerID, 
 					otherPeerID);
-			
-			// That's it for the demo. Close down this connection.
+			// TODO Call handleMsg of peerConnection.
 			info("Handshake established to "+otherPeerID);
 			info("Closing connection to "+otherPeerID);
 			close();
 		}
 	}
+	@Override
+    public void handleMsg(Message msg) {
+        super.handleMsg(msg);
+        // Behaviors of receiving bitfield of server and client are different.
+        if (msg.type == Message.MessageType.bitfield) {
+            List<Integer> defectSubFiles = file_wrapper.getDefectSubFiles();
+            int pieceNum = file_wrapper.pieceNum;
+            if (defectSubFiles.size() < pieceNum) {
+                int len = 8 - (pieceNum % 8) + pieceNum;
+                int lenOfByteArray = len / 8;
+                byte[] msgPayload = new byte[lenOfByteArray];
+                int[] temp = new int[len];
+                Arrays.fill(temp, 1);
+                for (int i :
+                        defectSubFiles) {
+                    temp[i] = 0;
+                }
+                for (int i = 0; i < lenOfByteArray; i++) {
+                    int begin = i * 8;
+                    for (int j = 0; j < 8; j++) {
+                        msgPayload[i] = (byte) (msgPayload[i] + (1 << (7 - j)));
+                    }
+                }
+                Message sendMsg = new Message(Message.MessageType.bitfield, msgPayload);
+                sendMsg(sendMsg);
+            }
+        }
+    }
 }

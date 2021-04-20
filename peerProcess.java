@@ -1,5 +1,5 @@
 /**
- * @author cwphang 
+ * @author cwphang, kai
  * 
  * peerProcess implementation.
  * It is able to:
@@ -11,7 +11,9 @@
  */
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.time.Period;
+import java.util.*;
+
 import p2peer.*;
 
 public class peerProcess {
@@ -28,7 +30,7 @@ public class peerProcess {
 		if(args.length == 2)
 			PeerConnection.debug = true;
 		int peerID = Integer.parseInt(args[0]);
-		PeerConnection.myPeerID = peerID;
+		PeerConnection.myPeerID = peerID; //TODO Compile Error
 		
 		
 		info("Starting peerProcess "+peerID);
@@ -80,6 +82,88 @@ public class peerProcess {
 			
 		}
 		
+		// While not all machines have complete file, select unchoke neighbors.
+		while (PeerConnection.file_wrapper.getDefectSubFiles().size() > 0
+				|| (!server.allComplete()) ||
+				connections.stream().anyMatch(conn -> {
+					for (int i :
+							conn.getNeighborBitfield()) {
+						if (i != 1) {
+							return true;
+						}
+					}
+					return false;
+				}) ) {
+			Timer timer = new Timer();
+			timer.schedule(new TimerTask() {
+				@Override
+				public void run() {
+					List<Integer> peerIdByOrder = new ArrayList<Integer>();
+					PeerConnection.neighborRates.entrySet().stream()
+							.sorted(Map.Entry
+									.comparingByValue())
+							.forEachOrdered(b->peerIdByOrder.add(b.getKey()));
+					int preferredSize = PeerConnection.commonCfg.get_number_of_preferred_neighbors();
+					List<Integer> chokeList = new ArrayList<Integer>();
+					List<Integer> unchokeList = new ArrayList<Integer>();
+					for (int i = 0; i < preferredSize; i++) {
+						if (!PeerConnection.preferredNeighbors.contains(peerIdByOrder.get(i))) {
+							unchokeList.add(peerIdByOrder.get(i));
+						}
+					}
+					for (int i :
+							PeerConnection.preferredNeighbors) {
+						if (peerIdByOrder.indexOf(i) == -1 || peerIdByOrder.indexOf(i) >= preferredSize) {
+							chokeList.add(i);
+						}
+					}
+					int countPreferred = 1;
+					for (PeerConnection conn :
+							connections) {
+						if (sendChokeMsg(conn, unchokeList, chokeList, countPreferred) == 1){
+							countPreferred++;
+						}
+					}
+					for (PeerConnection conn :
+							Server.handlers) {
+						if (sendChokeMsg(conn, unchokeList, chokeList, countPreferred) == 1){
+							countPreferred++;
+						}
+					}
+					PeerConnection.preferredNeighbors.clear();
+					// Update preferred neighbors.
+					for (int i = 0; i < preferredSize; i++) {
+						PeerConnection.preferredNeighbors.add(peerIdByOrder.get(i));
+					}
+				}
+			}, PeerConnection.commonCfg.get_unchoking_interval() * 1000);
+			timer.schedule(new TimerTask() {
+				@Override
+				public void run() {
+					List<Integer> candidate = new ArrayList<Integer>();
+					PeerConnection.neighborRates.entrySet().stream().filter(
+							e -> (!PeerConnection.preferredNeighbors.contains(e.getKey())) &&
+									PeerConnection.interestedNeighbors.contains(e.getKey())
+					).forEach(e -> candidate.add(e.getKey()));
+					PeerConnection.optNeighbor = candidate.get(new Random().nextInt(candidate.size()-1));
+					for (PeerConnection conn :
+							connections) {
+						if (conn.otherPeerID == PeerConnection.optNeighbor){
+							conn.sendMsg(new Message(Message.MessageType.unchoke), false, null, true);
+							break;
+						}
+					}
+					for (PeerConnection conn :
+							Server.handlers) {
+						if (conn.otherPeerID == PeerConnection.optNeighbor){
+							conn.sendMsg(new Message(Message.MessageType.unchoke), false, null, true);
+							break;
+						}
+					}
+				}
+			}, PeerConnection.commonCfg.get_optimistic_unchoking_interval() * 1000);
+		}
+		
 		info("press enter to close this demo:");
 		try {
 			System.in.read();
@@ -108,7 +192,30 @@ public class peerProcess {
 		}
 		info("All done!");
 	}
-
+	
+	/**
+	 *
+	 * @param conn
+	 * @param unchokeList
+	 * @param chokeList
+	 * @param countPreferred
+	 * @return 1 for unchoke, 0 for choke, -1 for nothing.
+	 */
+	private static int sendChokeMsg(PeerConnection conn, List<Integer> unchokeList, List<Integer> chokeList, int countPreferred) {
+		if (unchokeList.contains(conn.otherPeerID)) {
+			Message sendMsg = new Message(Message.MessageType.unchoke);
+			conn.sendMsg(sendMsg, countPreferred == unchokeList.size(), unchokeList);
+			return 1;
+		}
+		else if (chokeList.contains(conn.otherPeerID)) {
+			//TODO Stop sending pieces.
+			Message sendMsg = new Message(Message.MessageType.choke);
+			conn.sendMsg(sendMsg);
+			return 0;
+		}
+		return -1;
+	}
+	
 	public static void info(String str) {
 		PeerConnection.info(str);
 	}

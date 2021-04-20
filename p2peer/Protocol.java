@@ -54,6 +54,10 @@ public class Protocol {
 		
 		ByteBuffer peerID = ByteBuffer.allocate(4);
 		System.arraycopy(buf.array(), 28, peerID.array(), 0, 4);
+		
+		// Initialize neighbors.
+		PeerConnection.neighborRates.put(peerID.getInt(), 0L);
+		
 		return peerID.getInt();
 	}
 	

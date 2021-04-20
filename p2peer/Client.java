@@ -1,5 +1,5 @@
 /**
- * @author cwphang
+ * @author cwphang, kai
  * 
  * The client interface for the project.
  */
@@ -8,6 +8,8 @@ package p2peer;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.List;
 
 public class Client extends PeerConnection {
 	public Client(int peerID, String host, int port, boolean hasFile) throws UnknownHostException, IOException {
@@ -32,9 +34,13 @@ public class Client extends PeerConnection {
 				// Log our connection.
 				logging.tcp_connect_to(
 						myPeerID, otherPeerID);
-				
-				// That's it for the demo. Close.
 				connInfo("Done with handshake.");
+				
+				//Send bitfield
+				connInfo("Sending bitfield");
+				sendBitField();
+				connInfo("Done with sending bitfield.");
+				
 				close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -42,4 +48,52 @@ public class Client extends PeerConnection {
 			}
 		}
 	}
+	private void sendBitField() {
+		List<Integer> defectSubFiles = file_wrapper.getDefectSubFiles();
+		int pieceNum = file_wrapper.pieceNum;
+		int len = 8 - (pieceNum % 8) + pieceNum;
+		int lenOfByteArray = len / 8;
+		byte[] msgPayload = new byte[lenOfByteArray];
+		int[] temp = new int[len];
+		Arrays.fill(temp, 1);
+		for (int i :
+				defectSubFiles) {
+			temp[i] = 0;
+		}
+		for (int i = 0; i < lenOfByteArray; i++) {
+			int begin = i * 8;
+			for (int j = 0; j < 8; j++) {
+				msgPayload[i] = (byte) (msgPayload[i] + (1 << (7 - j)));
+			}
+		}
+		Message sendMsg = new Message(Message.MessageType.bitfield, msgPayload);
+		sendMsg(sendMsg);
+	}
+	
+	@Override
+	public void handleMsg(Message msg) {
+		super.handleMsg(msg);
+		// Behaviors of receiving bitfield of server and client are different.
+		if (msg.type == Message.MessageType.bitfield) {
+			List<Integer> defectSubFiles = file_wrapper.getDefectSubFiles();
+			int pieceNum = file_wrapper.pieceNum;
+			byte[] msgPayload = new byte[msg.payload.remaining()];
+			int[] serverBitField = new int[pieceNum];
+			for (int i = 0; i < pieceNum; i++) {
+				int index = i/8;
+				int offside = 7-(i%8);
+				serverBitField[i] = msgPayload[index] & (1 << offside);
+			}
+			boolean interested = false;
+			for (int i :
+					defectSubFiles) {
+				if (serverBitField[i] == 1) {
+					interested = true;
+					break;
+				}
+			}
+			sendInterestedMsg(interested);
+		}
+	}
+	
 }
