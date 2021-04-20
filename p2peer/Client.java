@@ -41,8 +41,18 @@ public class Client extends PeerConnection {
 				sendBitField();
 				connInfo("Done with sending bitfield.");
 				
-				close();
 			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			try {
+				try {
+					handleMsg(Protocol.getMessage(in));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				close();
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}

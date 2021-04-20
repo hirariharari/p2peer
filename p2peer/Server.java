@@ -73,26 +73,33 @@ class Handler extends PeerConnection {
 		run();
 	}
 	public void run() {
-		while(!socket.isClosed()) {
-			//Need to get the peer id of the connecting process.
-			try {
-				info("Incoming connection. Reading...");
-				this.otherPeerID = Protocol.getHandshake(in);
-				//return the handshake
-				Protocol.putHandshake(out, +myPeerID);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			
-			// Log our connection.
-			logging.tcp_connect_from(
-					myPeerID, 
-					otherPeerID);
-			// TODO Call handleMsg of peerConnection.
-			info("Handshake established to "+otherPeerID);
-			info("Closing connection to "+otherPeerID);
-			close();
-		}
+        // TODO Check the logic of the loop.
+        //Need to get the peer id of the connecting process.
+        try {
+            info("Incoming connection. Reading...");
+            this.otherPeerID = Protocol.getHandshake(in);
+            //return the handshake
+            Protocol.putHandshake(out, +myPeerID);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        // Log our connection.
+        logging.tcp_connect_from(
+                myPeerID,
+                otherPeerID);
+        info("Handshake established to " + otherPeerID);
+
+        while (!socket.isClosed()) {
+
+            try {
+                handleMsg(Protocol.getMessage(in));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            info("Closing connection to " + otherPeerID);
+            close();
+        }
 	}
 	@Override
     public void handleMsg(Message msg) {
