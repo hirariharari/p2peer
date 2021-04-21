@@ -38,7 +38,7 @@ public class FileWrapper {
 	String peer_name = "peer_" + PeerConnection.myPeerID;
     Path peerDir = Paths.get(projectDir + "/"+ peer_name).toAbsolutePath(); 
 
-	File file = new File(peerDir + "temp_file_name");
+	File file = new File(peerDir + PeerConnection.commonCfg.get_file_name());
 	ByteBuffer[] subFiles = new ByteBuffer[pieceNum];
 	
 	Semaphore [] subFileSemaphore = new Semaphore[pieceNum];
