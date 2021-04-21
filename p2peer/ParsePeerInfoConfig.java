@@ -44,4 +44,17 @@ public class ParsePeerInfoConfig
     {
         return config_values.get(Integer.toString(host_id));
     }
+    
+    public String get_host_name(int host_id) {
+		return get_host_values(host_id)[0];
+    }
+    
+    public int get_host_port(int host_id) {
+    	return Integer.parseInt(get_host_values(host_id)[1]);
+    }
+    
+    public boolean get_host_has_file(int host_id) {
+    	return (get_host_values(host_id)[2].equals("1") ? true : false);
+    }
+    
 }

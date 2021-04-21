@@ -22,17 +22,12 @@ public class peerProcess {
 		Server server = null; // This peer's server connection
 		ArrayList<PeerConnection> connections = 
 				new ArrayList<PeerConnection>(); // A list of connected peers.
-		// FileWrapper filewrapper; // A FileWrapper object for the file of interest.
-
 		
 		if(args.length == 2)
 			PeerConnection.debug = true;
 		int peerID = Integer.parseInt(args[0]);
-		PeerConnection.myPeerID = peerID;
-		
-		
-		info("Starting peerProcess "+peerID);
-		
+		PeerConnection.myPeerID = peerID;	
+
 		// Start the server
 		try {
 			info("Starting server...");
@@ -57,13 +52,11 @@ public class peerProcess {
 			if (otherPeerID == peerID) {
 				info("This is my peerID!");
 				break;
-			}
-			String [] values = PeerConnection.peerCfg.get_host_values(otherPeerID);
-			
-			// convert values to appropriate form
-			String host = values[0];
-			int port = Integer.parseInt(values[1]);
-			boolean hasFile = (values[2].equals("1") ? true : false);
+			}			
+			// pull values for otherPeerID
+			String host = PeerConnection.peerCfg.get_host_name(otherPeerID);
+			int port = PeerConnection.peerCfg.get_host_port(otherPeerID);
+			boolean hasFile = PeerConnection.peerCfg.get_host_has_file(otherPeerID);
 
 			//set some variables
 			int file_size = PeerConnection.commonCfg.get_file_size();
