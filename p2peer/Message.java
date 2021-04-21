@@ -20,11 +20,11 @@ public class Message {
 		piece (7)
 		;
 		
-		private final byte[] typeValue = new byte [1];
+		final byte typeValue;
 		MessageType(int typeValue) {
-			this.typeValue[0] = (byte) typeValue;
+			this.typeValue = (byte) typeValue;
 		}
-		public byte[] getBytes() {
+		public byte getValue() {
 			return typeValue;
 		}
 		public static MessageType getMessageType(byte b) {

@@ -56,7 +56,7 @@ public class Protocol {
 		System.arraycopy(buf.array(), 28, peerID.array(), 0, 4);
 		
 		// Initialize neighbors.
-		PeerConnection.neighborRates.put(peerID.getInt(), 0L);
+		// PeerConnection.neighborRates.put(peerID.getInt(), 0L);
 		
 		return peerID.getInt();
 	}
@@ -165,17 +165,12 @@ public class Protocol {
 	 * @return			A byte array representation of the message.
 	 */
 	private static byte[] encodeMessage(Message message) {
-		byte[] messageBytes = new byte[5+message.payload.array().length];
+		ByteBuffer messageBytes = ByteBuffer.allocate(5+message.payload.array().length);
 		
-		byte[] lengthBytes = intToBytes(message.payload.array().length);
-		byte[] messageType = message.type.getBytes();
-		
-		System.arraycopy(lengthBytes, 0, messageBytes, 0, 4);
-		System.arraycopy(messageType, 0, messageBytes, 4, 1);
-		System.arraycopy(message.payload.array(), 0, messageBytes, 5, 
-				message.payload.array().length);
-		
-		return messageBytes;
+		messageBytes.putInt(message.payload.array().length);
+		messageBytes.put(message.type.typeValue);
+		messageBytes.put(message.payload.array());
+		return messageBytes.array();
 		
 	}
 }

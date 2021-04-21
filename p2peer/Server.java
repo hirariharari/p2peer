@@ -78,7 +78,7 @@ class Handler extends PeerConnection {
             info("Incoming connection. Reading handshake...");
             this.otherPeerID = Protocol.getHandshake(in);
             //return the handshake
-            Protocol.putHandshake(out, +myPeerID);
+            Protocol.putHandshake(out, myPeerID);
             // Log our connection.
             logging.tcp_connect_from(
                     myPeerID,

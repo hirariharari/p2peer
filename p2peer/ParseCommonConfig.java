@@ -37,12 +37,12 @@ public class ParseCommonConfig
 
     public int get_unchoking_interval()
     {
-        return Integer.parseInt(config_values.get("Unchokinginterval"));
+        return Integer.parseInt(config_values.get("UnchokingInterval"));
     }
 
     public int get_optimistic_unchoking_interval()
     {
-        return Integer.parseInt(config_values.get("OptimisticUnchokingINterval"));
+        return Integer.parseInt(config_values.get("OptimisticUnchokingInterval"));
     }
 
     public String get_file_name()

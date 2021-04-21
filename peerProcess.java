@@ -160,14 +160,19 @@ public class peerProcess {
 			}, PeerConnection.commonCfg.get_optimistic_unchoking_interval() * 1000);
 		}
 
-		// Wait for all connections to die.
-		
-		info("press enter to close this demo:");
 		try {
-			System.in.read();
-		} catch (IOException e1) {
-			// There was an issue reading from system.in
-			e1.printStackTrace();
+			while(!server.allComplete()) {
+				Thread.sleep(1000);
+			}
+		} catch(Exception e) {e.printStackTrace();}
+		
+		for(PeerConnection conn : connections) {
+			try {
+				conn.close();
+				conn.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 
 		info("Closing server...");
