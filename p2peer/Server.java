@@ -37,7 +37,7 @@ public class Server extends Thread {
 			srvSocket.close();
 		} catch (IOException e) {
 			// We don't actually care if this fails, because the socket
-			//would be closed.
+			// would be closed.
 		}
 	}
 	public boolean isClosed() {

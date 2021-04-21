@@ -1,5 +1,5 @@
 /**
- * @author kai, pkakaraparti
+ * @author kai, pkakaraparti, cwphang
  * Implement a file wrapper that puts the file in memory,
  * can package segments of a file for sending, and can piece together a complete
  * file from segments received.
@@ -8,10 +8,9 @@ package p2peer;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.nio.file.Files;
+import java.nio.ByteBuffer;
+import java.nio.file.*;
 import java.util.*;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
@@ -40,7 +39,7 @@ public class FileWrapper {
     Path peerDir = Paths.get(projectDir + "/"+ peer_name).toAbsolutePath(); 
 
 	File file = new File(peerDir + "temp_file_name");
-	File[] subFiles = new File[pieceNum];
+	ByteBuffer[] subFiles = new ByteBuffer[pieceNum];
 	
 	Semaphore [] subFileSemaphore = new Semaphore[pieceNum];
 	
@@ -74,30 +73,17 @@ public class FileWrapper {
 			try 
 			{	
 				//first, represent the file as a byte array
-				byte[] file_byte_array = Files.readAllBytes(this.file.toPath());
+				ByteBuffer file_byte_array = ByteBuffer.wrap(Files.readAllBytes(file.toPath()));
+				
 				//now populate the subfiles
-				int i,j;
-				int start_index = 0;
-				int end_index = pieceSize -1;
-				for(i = 0; i < pieceNum; i++)
-				{	
-					//represent the subFile as a byte array
-					byte[] subFile = Files.readAllBytes(subFiles[i].toPath());
-					for(j = start_index; j <= end_index; j++)
-					{
-						subFile[j - start_index] = file_byte_array[j];
-					} 
-					Files.write(subFiles[i].toPath(), subFile);
-					start_index += pieceSize;
-					//last piece may not be full
-					if(i == pieceNum - 2) //next i will be last piece
-						end_index += file_byte_array.length - 1;
-					else	
-						end_index += pieceSize;
+				for (int i = 0; i < pieceNum; i++) {
+					subFiles[i] = ByteBuffer.allocate(pieceSize);
+					subFiles[i].put(0, file_byte_array.array(), i*pieceNum, pieceNum);
 				}
 			} 
 			catch (Exception e) 
 			{
+				// There was a problem reading from the file.
 				e.printStackTrace();
 			}
 		}
@@ -117,14 +103,13 @@ public class FileWrapper {
 	 * @param pieceIndex
 	 * @return
 	 */
-	public File getSubFile(int pieceIndex)
+	public ByteBuffer getSubFile(int pieceIndex)
 	{
 		if(pieceIndex > pieceNum)
 			return null;
 		else
 		{
-			File subFile = subFiles[pieceIndex];
-			return subFile;
+			return subFiles[pieceIndex].asReadOnlyBuffer();
 		}
 	}
 
@@ -134,7 +119,7 @@ public class FileWrapper {
 	 * @param pieceIndex
 	 * @param pieceNum
 	 */
-	public void receiveSubFile(File subFile, int pieceIndex) 
+	public void receiveSubFile(ByteBuffer subFile, int pieceIndex) 
 	{
 		subFiles[pieceIndex] = subFile;
 	}
@@ -157,29 +142,13 @@ public class FileWrapper {
 		{	
 			try 
 			{
-				byte[] file_byte_array = Files.readAllBytes(file.toPath());
-				int i,j;
-				int start_index =0;
-				int end_index = pieceSize -1;
-				for(i=0; i< subFiles.length; i++)
-				{
-					byte[] subFile = Files.readAllBytes(subFiles[i].toPath());
-					for(j=start_index; j<=end_index; j++)
-					{
-						file_byte_array[j] = subFile[j - start_index];
-					}
-					start_index += pieceSize;
-					//last piece may not be full
-					if(i == pieceNum - 2) //next i will be last piece
-						end_index += file_byte_array.length - 1;
-					else	
-						end_index += pieceSize;
+				BufferedOutputStream file_out = new BufferedOutputStream(Files.newOutputStream(file.toPath()));
+				for(int i = 0; i < pieceNum; i++) {
+					file_out.write(subFiles[i].array());
 				}
-				
-				//write the file byte array to the file and update hasFile
-				Files.write(file.toPath(), file_byte_array);
+				file_out.flush();
+				file_out.close();
 				hasFile = true;
-				
 			} 
 			catch (Exception e) 
 			{
@@ -205,7 +174,7 @@ public class FileWrapper {
 			//assign the piece index (bytebuffer is moved)
 			int piece_index = piece_message.payload.getInt();
 			
-			// Lock the subfile to avoid concurrent access.
+			// Lock the subfile to avoid concurrent writes.
 			try {
 				subFileSemaphore[piece_index].acquire();
 			}
@@ -213,22 +182,12 @@ public class FileWrapper {
 			
 			//now for the actual piece data
 			//allocate to the size of piece_data to be the size of payload's remaining data
-			byte[] piece_data = new byte[piece_message.payload.remaining()];
+			subFiles[piece_index] = ByteBuffer.allocate(piece_message.payload.remaining());
 			//copy data from bytebuffer into piece_data
-			piece_message.payload.get(piece_data, 0, piece_data.length);
-
-			//now to write piece_data byte array into its respective subFile
-			try 
-			{
-				Files.write(subFiles[piece_index].toPath(), piece_data);
-				//check if the peer has all the subfiles at this point, to combine them 
-				check_combine_subfiles();
-
-			} 
-			catch (Exception e) 
-			{
-				e.printStackTrace();
-			}
+			piece_message.payload.get(
+					subFiles[piece_index].array(),
+					0,
+					subFiles[piece_index].array().length);
 
 			// Update defect subFiles.
 			defectSubFiles.remove(defectSubFiles.indexOf(piece_index));
@@ -245,27 +204,15 @@ public class FileWrapper {
 	 */
 	public void send_piece_message(int pieceIndex, BufferedOutputStream out)
 	{	
-		//get the appropriate subfile corresponding to pieceIndex
-		File file = getSubFile(pieceIndex);
+		ByteBuffer piece_payload = ByteBuffer.allocate(pieceSize + 4);
 		try
-		{	
-			//the subfile as a byte array
-			byte[] file_byte_array = Files.readAllBytes(file.toPath());
-			
+		{
 			//the piece message contains 4 bytes piece index followed by the piece data
 			//4 bytes representing piece index
-			byte[] piece_index_bytes = Protocol.intToBytes(pieceIndex);
+			piece_payload.putInt(pieceIndex);
+			
 			//the payload of the piece message
-			byte[] piece_payload = new byte[file_byte_array.length + 4];
-			int i;
-			for(i = 0; i < 4; i++)
-			{
-				piece_payload[i] = piece_index_bytes[i];
-			}
-			for(i = 0; i < file_byte_array.length; i++)
-			{
-				piece_payload[i + 4] = file_byte_array[i];
-			}
+			piece_payload.put(subFiles[pieceIndex].array());
 
 			//now to construct the piece message and send it
 			Message piece_message = new Message(MessageType.piece, piece_payload);

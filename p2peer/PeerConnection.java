@@ -23,12 +23,7 @@ public class PeerConnection extends Thread {
 
 	Socket socket; // Should be a unique socket for this connection.
 	boolean hasFile; // Whether the other peer has the file.
-	public static FileWrapper file_wrapper = new FileWrapper(new File(String.valueOf(myPeerID), // TODO: This is how
-																								// project_config_file
-																								// is given
-			// but the instructions say it should use "peer_[peerID]" instead.
-			commonCfg.get_file_name()), peerCfg.get_host_has_file(myPeerID));
-
+	public static FileWrapper file_wrapper = null;
 	// requestingPieceNums and neighbors should be shared by clients and server in
 	// the same machine.
 	public static List<Integer> requestingPieceNums = new ArrayList<Integer>();
