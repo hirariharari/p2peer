@@ -95,6 +95,10 @@ public class PeerConnection extends Thread {
 			// Update interestedNeighbors of PeerConnection.
 			if (interestedNeighbors.contains(otherPeerID)) {
 				PeerConnection.interestedNeighbors.remove(PeerConnection.interestedNeighbors.indexOf(otherPeerID));
+				// if no neighbors are interested, close connection.
+				if (PeerConnection.interestedNeighbors.isEmpty()) {
+					close();
+				}
 			}
 			logging.receive_not_interested(myPeerID, otherPeerID);
 		} else if (msg.type == Message.MessageType.bitfield) {
@@ -151,6 +155,8 @@ public class PeerConnection extends Thread {
 			}
 		}
 	}
+	
+	
 
 	protected void sendInterestedMsg(boolean interested) {
 		if (interested) {

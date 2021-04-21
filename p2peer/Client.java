@@ -21,41 +21,35 @@ public class Client extends PeerConnection {
 		this.start();
 	}
 	public void run() {
-		while(!socket.isClosed()) {
-			// Start with a handshake.
-			try {
-				connInfo("Sending handshake...");
-				Protocol.putHandshake(out, myPeerID);
-				
-				// Expect a handshake back. We already have the peerID.
-				connInfo("Handshake sent. Receiving handshake...");
-				Protocol.getHandshake(in);
-				
-				// Log our connection.
-				logging.tcp_connect_to(
-						myPeerID, otherPeerID);
-				connInfo("Done with handshake.");
-				
-				//Send bitfield
-				connInfo("Sending bitfield");
-				sendBitField();
-				connInfo("Done with sending bitfield.");
-				
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		try {
+			connInfo("Sending handshake...");
+			Protocol.putHandshake(out, myPeerID);
+			
+			// Expect a handshake back. We already have the peerID.
+			connInfo("Handshake sent. Receiving handshake...");
+			int returnedPeerID = Protocol.getHandshake(in);
+			if (returnedPeerID != otherPeerID) {
+				System.err.println("Warning: received handshake with incorrect peer ID.");
 			}
-			try {
-				try {
-					handleMsg(Protocol.getMessage(in));
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				close();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			
+			
+			// Log our connection.
+			logging.tcp_connect_to(
+					myPeerID, otherPeerID);
+			connInfo("Done with handshake.");
+			
+			//Send bitfield
+			connInfo("Sending bitfield");
+			sendBitField();
+			connInfo("Done with sending bitfield.");
+			
+			while (!isClosed()) {
+				handleMsg(Protocol.getMessage(in));
 			}
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	private void sendBitField() {

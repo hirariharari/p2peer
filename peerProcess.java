@@ -160,6 +160,8 @@ public class peerProcess {
 			}, PeerConnection.commonCfg.get_optimistic_unchoking_interval() * 1000);
 		}
 
+		// Wait for all connections to die.
+		
 		info("press enter to close this demo:");
 		try {
 			System.in.read();

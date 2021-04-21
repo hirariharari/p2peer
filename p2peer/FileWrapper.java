@@ -8,6 +8,7 @@ package p2peer;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.*;
 import java.util.*;
@@ -39,7 +40,7 @@ public class FileWrapper {
     Path peerDir = Paths.get(projectDir + "/"+ peer_name).toAbsolutePath(); 
 
 	File file = new File(peerDir + PeerConnection.commonCfg.get_file_name());
-	ByteBuffer[] subFiles = new ByteBuffer[pieceNum];
+	File[] subFiles = new File[pieceNum];
 	
 	Semaphore [] subFileSemaphore = new Semaphore[pieceNum];
 	
@@ -77,8 +78,10 @@ public class FileWrapper {
 				
 				//now populate the subfiles
 				for (int i = 0; i < pieceNum; i++) {
-					subFiles[i] = ByteBuffer.allocate(pieceSize);
-					subFiles[i].put(0, file_byte_array.array(), i*pieceNum, pieceNum);
+					ByteBuffer buffer = ByteBuffer.allocate(pieceSize);
+					buffer.put(0, file_byte_array.array(), i*pieceNum, pieceNum);
+					String subFilePath = file.toPath().toString()+"_part"+String.valueOf(i);
+					subFiles[i] = new File(subFilePath);
 				}
 			} 
 			catch (Exception e) 
@@ -103,13 +106,13 @@ public class FileWrapper {
 	 * @param pieceIndex
 	 * @return
 	 */
-	public ByteBuffer getSubFile(int pieceIndex)
+	public File getSubFile(int pieceIndex)
 	{
 		if(pieceIndex > pieceNum)
 			return null;
 		else
 		{
-			return subFiles[pieceIndex].asReadOnlyBuffer();
+			return subFiles[pieceIndex];
 		}
 	}
 
@@ -119,7 +122,7 @@ public class FileWrapper {
 	 * @param pieceIndex
 	 * @param pieceNum
 	 */
-	public void receiveSubFile(ByteBuffer subFile, int pieceIndex) 
+	public void receiveSubFile(File subFile, int pieceIndex) 
 	{
 		subFiles[pieceIndex] = subFile;
 	}
@@ -144,7 +147,7 @@ public class FileWrapper {
 			{
 				BufferedOutputStream file_out = new BufferedOutputStream(Files.newOutputStream(file.toPath()));
 				for(int i = 0; i < pieceNum; i++) {
-					file_out.write(subFiles[i].array());
+					file_out.write(Files.readAllBytes(subFiles[i].toPath()));
 				}
 				file_out.flush();
 				file_out.close();
@@ -182,12 +185,15 @@ public class FileWrapper {
 			
 			//now for the actual piece data
 			//allocate to the size of piece_data to be the size of payload's remaining data
-			subFiles[piece_index] = ByteBuffer.allocate(piece_message.payload.remaining());
+			ByteBuffer buffer = ByteBuffer.allocate(piece_message.payload.remaining());
+			buffer.put(piece_message.payload);
 			//copy data from bytebuffer into piece_data
-			piece_message.payload.get(
-					subFiles[piece_index].array(),
-					0,
-					subFiles[piece_index].array().length);
+			try {
+				BufferedOutputStream out = new BufferedOutputStream(Files.newOutputStream(subFiles[piece_index].toPath()));
+				out.write(buffer.array());
+				out.flush();
+			} catch (IOException e) {e.printStackTrace();}
+			
 
 			// Update defect subFiles.
 			defectSubFiles.remove(defectSubFiles.indexOf(piece_index));
@@ -212,7 +218,7 @@ public class FileWrapper {
 			piece_payload.putInt(pieceIndex);
 			
 			//the payload of the piece message
-			piece_payload.put(subFiles[pieceIndex].array());
+			piece_payload.put(Files.readAllBytes(subFiles[pieceIndex].toPath()));
 
 			//now to construct the piece message and send it
 			Message piece_message = new Message(MessageType.piece, piece_payload);
