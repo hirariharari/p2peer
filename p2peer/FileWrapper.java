@@ -6,12 +6,14 @@
  */
 package p2peer;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
 import p2peer.Message.MessageType;
 
@@ -25,7 +27,7 @@ public class FileWrapper {
 	 */
 	
 	boolean hasFile;
-	PeerConnection peer;
+	//PeerConnection peer;
 
 	 //some variables
 	int fileSize = PeerConnection.commonCfg.get_file_size();
@@ -40,35 +42,32 @@ public class FileWrapper {
 	File file = new File(peerDir + "temp_file_name");
 	File[] subFiles = new File[pieceNum];
 	
+	Semaphore [] subFileSemaphore = new Semaphore[pieceNum];
+	
 	public List<Integer> getDefectSubFiles() {
         return defectSubFiles;
     }
 
     private List<Integer> defectSubFiles = new ArrayList<Integer>();
 
-	public FileWrapper() {}
-
 	//if the peer starts with the File, initialize it
-	public FileWrapper(PeerConnection peer, File file, boolean hasFile)
+	public FileWrapper(File file, boolean hasFile)
 	{
-		this.peer = peer;
 		this.file = file;
 		this.hasFile = hasFile;
 		initialization();
 	}
 
-	//if the peer doesn't start with the file, we need to create one
-	public FileWrapper(PeerConnection peer, boolean hasFile)
-	{
-		this.peer = peer;
-		this.hasFile = hasFile;
-		initialization();
-	}
 
 	/**
 	 * If a peer has a complete file, call this method to initialize.
 	 */
 	public void initialization(){
+		// Allocate semaphores
+		for(int i=0; i<pieceNum; i++) {
+			subFileSemaphore[i] = new Semaphore(1);
+		}
+		
 		//if this peer has the entire file, divide it up into sub files
 		if(hasFile)
 		{
@@ -205,6 +204,13 @@ public class FileWrapper {
 			
 			//assign the piece index (bytebuffer is moved)
 			int piece_index = piece_message.payload.getInt();
+			
+			// Lock the subfile to avoid concurrent access.
+			try {
+				subFileSemaphore[piece_index].acquire();
+			}
+			catch(Exception e) {e.printStackTrace();}
+			
 			//now for the actual piece data
 			//allocate to the size of piece_data to be the size of payload's remaining data
 			byte[] piece_data = new byte[piece_message.payload.remaining()];
@@ -226,6 +232,9 @@ public class FileWrapper {
 
 			// Update defect subFiles.
 			defectSubFiles.remove(defectSubFiles.indexOf(piece_index));
+			
+			// Release file lock.
+			subFileSemaphore[piece_index].release();
 		}
 	
 	}
@@ -234,7 +243,7 @@ public class FileWrapper {
 	 * Construct a piece message and send it to the other peer
 	 * @param pieceIndex
 	 */
-	public void send_piece_message(int pieceIndex)
+	public void send_piece_message(int pieceIndex, BufferedOutputStream out)
 	{	
 		//get the appropriate subfile corresponding to pieceIndex
 		File file = getSubFile(pieceIndex);
@@ -260,7 +269,7 @@ public class FileWrapper {
 
 			//now to construct the piece message and send it
 			Message piece_message = new Message(MessageType.piece, piece_payload);
-			Protocol.putMessage(peer.out, piece_message);
+			Protocol.putMessage(out, piece_message);
 
 		}
 		catch(Exception e)
